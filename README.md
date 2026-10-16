@@ -8,7 +8,7 @@ and a niri config that ties them together:
 | Piece | Tool | Keys |
 |---|---|---|
 | Polkit agent (password prompts from apps) | polkit-kde-agent | — |
-| Idle and lock | swayidle + swaylock | Mod+Alt+L to lock |
+| Idle and lock screen | hypridle + hyprlock | Mod+Alt+L to lock |
 | Wallpaper | awww (remembers the last image) | Ctrl+Alt+T to pick one, with previews |
 | Clipboard history (text and images) | walker | Mod+V |
 | Launcher, calculator, emoji | [walker](https://github.com/abenz1267/walker) | Mod+Space |
@@ -17,8 +17,8 @@ and a niri config that ties them together:
 | Screen recording | slurp + wf-recorder | Mod+Shift+R (again to stop) |
 | Power menu | walker | Mod+Shift+Q |
 
-There is no daemon or script of its own: just config files for niri, swayidle,
-swaylock and walker, plus an install script. Mod+Slash lists the keys.
+There is no daemon or script of its own: just config files for niri, hypridle,
+hyprlock and walker, plus an install script. Mod+Slash lists the keys.
 
 ## Install
 
@@ -39,7 +39,7 @@ It lists what it will do and asks first. It:
   `niri/config.kdl`) is saved under `~/.local/state/dm-desktop`;
 - checks the resulting niri config with `niri validate` before writing anything.
 
-Then log out and back in: niri starts the daemons (polkit agent, swayidle, awww-daemon,
+Then log out and back in: niri starts the daemons (polkit agent, hypridle, awww-daemon,
 elephant and walker) at login. Set a wallpaper once with `awww img FILE` or
 Ctrl+Alt+T (it lists `~/Pictures/Wallpapers`). awww restores it at every login after
 that.
@@ -59,8 +59,8 @@ the ones it added. Log out and back in to stop the daemons.
 ~/.config/niri/dm-desktop/binds.kdl    keybinds
 ~/.config/niri/dmsh.kdl                dmsh's autostart and binds (from dmsh)
 ~/.config/niri/local.kdl               yours, optional, never touched
-~/.config/swayidle/config              screen off after 5 min, lock after 10, lock before sleep
-~/.config/swaylock/config              lock screen colors
+~/.config/hypr/hypridle.conf           screen off after 5 min, lock after 10, lock before sleep
+~/.config/hypr/hyprlock.conf           the lock screen: blurred desktop, clock, password pill
 ~/.config/walker/config.toml           launcher settings and its theme (black, like dmsh)
 ~/.config/elephant/menus/              the power menu and the wallpaper picker
 ```
@@ -119,7 +119,14 @@ is the fallback this repo used before.
   `polkit-kde-authentication-agent-1` (Arch, Fedora, Debian). Run only one polkit
   agent; a second one fails to register.
 - **Lock**: Mod+Alt+L, the idle timer and suspend all go through
-  `loginctl lock-session`. swayidle runs swaylock when that happens.
+  `loginctl lock-session`; hypridle starts hyprlock when that happens. Apps that ask
+  to stay awake pause the idle timers, whether they ask through Wayland (browsers playing
+  video, dmsh's Keep awake) or D-Bus (niri itself answers those).
+- **Lock before sleep**: hypridle's wait-until-locked mode needs a Hyprland protocol
+  that niri doesn't have, so suspend doesn't wait for the lock. hypridle starts hyprlock
+  directly instead, and hyprlock asks niri to lock in about 0.1 s (measured in a VM, via
+  the slower `loginctl` path), normally before the system is done suspending. If you
+  ever see the desktop for a moment after waking, that's this race.
 - **Screenshots**: niri's UI copies the image to the clipboard and saves it to
   `~/Pictures/Screenshots`. Ctrl+C in the UI copies without saving.
 - **Recording** captures system audio (the default output's monitor) and saves to

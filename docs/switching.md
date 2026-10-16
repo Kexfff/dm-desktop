@@ -11,7 +11,7 @@ What changes:
 |---|---|
 | Bar, notifications, OSDs, tray | dmsh |
 | Polkit agent | polkit-kde-agent |
-| Lock screen and idle (screen off 5 min, lock 10 min, lock before sleep) | swayidle + swaylock, same timings |
+| Lock screen and idle (screen off 5 min, lock 10 min, lock before sleep) | hypridle + hyprlock, same timings; the lock shows the blurred desktop, clock and date |
 | Wallpaper and wallpaper picker | awww, and walker with previews, Ctrl+Alt+T |
 | Clipboard overlay (Mod+V) | walker, Mod+V. History starts empty: walker keeps its own, separate from iNiR's cliphist |
 | Overview / launcher (Mod+Space) | walker, Mod+Space. niri's overview stays on Mod+Tab |
@@ -124,7 +124,7 @@ reloads at once, so the iNiR keybinds stop working right after it. Log out right
 ### Check
 
 ```sh
-pgrep -a 'dmsh|swayidle|awww-daemon|polkit-kde|elephant|walker'   # all six running
+pgrep -a 'dmsh|hypridle|awww-daemon|polkit-kde|elephant|walker'   # all six running
 systemctl --user is-active inir.service                      # inactive: iNiR is off
 niri validate                                               # config is valid
 ```
@@ -144,7 +144,7 @@ From the dmsh session, or from a text console (Ctrl+Alt+F3) if the graphical ses
 is unusable:
 
 1. **Restore the old files**: iNiR's `config.kdl` comes back
-   byte for byte. dm-desktop's files, swayidle and swaylock configs go away:
+   byte for byte. dm-desktop's niri files and the hypr, walker and elephant configs go away:
 
    ```sh
    ~/Documents/Projects/dm-desktop/install.sh --uninstall
