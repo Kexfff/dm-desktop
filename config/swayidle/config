@@ -1,0 +1,7 @@
+# swayidle, started by niri (see niri/dm-desktop/startup.kdl). man swayidle
+# Screen off after 5 minutes, lock after 10, and lock before going to sleep.
+# Any input turns the screen back on.
+timeout 300 'niri msg action power-off-monitors'
+timeout 600 'loginctl lock-session'
+lock 'pgrep -x swaylock >/dev/null || swaylock -f'
+before-sleep 'pgrep -x swaylock >/dev/null || swaylock -f'

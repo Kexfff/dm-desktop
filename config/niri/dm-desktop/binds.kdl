@@ -1,0 +1,142 @@
+// Keybinds. "Mod" is Super (Alt in a nested niri window). Mod+Slash lists them.
+// dmsh's own binds (Mod+N, Mod+Ctrl+N, Mod+I) are in dmsh.kdl.
+// Docs: https://niri-wm.github.io/niri/Configuration:-Key-Bindings
+
+binds {
+    // --- Session -------------------------------------------------------------------
+    Mod+Slash { show-hotkey-overlay; }
+    Mod+Tab repeat=false { toggle-overview; }
+    Mod+Shift+E { quit; }
+    Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
+    Mod+Shift+O { power-off-monitors; }
+    Mod+Alt+L hotkey-overlay-title="Lock the screen" { spawn "loginctl" "lock-session"; }
+    Mod+Shift+Q hotkey-overlay-title="Power menu" { spawn-sh r#"
+        case $(printf '%s\n' Lock Suspend 'Log out' Reboot 'Power off' | fuzzel --dmenu --lines 5 --prompt 'Session: ') in
+            Lock) loginctl lock-session ;;
+            Suspend) systemctl suspend ;;
+            'Log out') niri msg action quit --skip-confirmation ;;
+            Reboot) systemctl reboot ;;
+            'Power off') systemctl poweroff ;;
+        esac"#; }
+
+    // --- Launchers -----------------------------------------------------------------
+    Mod+Space repeat=false hotkey-overlay-title="Launch an app" { spawn "fuzzel"; }
+    Mod+T hotkey-overlay-title="Terminal" { spawn "kitty"; }
+    Mod+Return { spawn "kitty"; }
+    Mod+V hotkey-overlay-title="Clipboard history" { spawn-sh r#"e=$(cliphist list | fuzzel --dmenu --with-nth 2 --prompt 'Clipboard: ') && printf '%s\n' "$e" | cliphist decode | wl-copy"#; }
+    Ctrl+Alt+T hotkey-overlay-title="Pick a wallpaper" { spawn-sh r#"cd ~/Pictures/Wallpapers && f=$(find . -type f | cut -c3- | sort | fuzzel --dmenu --prompt 'Wallpaper: ') && awww img "$f""#; }
+
+    // --- Screenshots and recording -------------------------------------------------
+    // niri's screenshot UI: pick a region or window, Space or Enter to copy and save,
+    // Ctrl+C to copy only. Files go to ~/Pictures/Screenshots.
+    Print { screenshot; }
+    Mod+Shift+S { screenshot; }
+    Ctrl+Print { screenshot-screen; }
+    Mod+Print { screenshot-screen; }
+    Alt+Print { screenshot-window; }
+    Mod+Shift+X hotkey-overlay-title="Copy text from a region (OCR)" { spawn-sh r#"t=$(grim -g "$(slurp)" - | tesseract - - -l eng 2>/dev/null) && [ -n "$t" ] && printf '%s' "$t" | wl-copy && notify-send -a OCR 'Text copied' "$t""#; }
+    // Press again to stop. Records system audio; saved to ~/Videos.
+    Mod+Shift+R hotkey-overlay-title="Record a region (again to stop)" { spawn-sh r#"
+        pkill -INT -x wf-recorder && exit
+        g=$(slurp) || exit
+        mkdir -p ~/Videos
+        f=~/Videos/recording_$(date +%Y-%m-%d_%H.%M.%S).mp4
+        wf-recorder -g "$g" --audio="$(pactl get-default-sink).monitor" -f "$f" && notify-send -a Recording 'Recording saved' "$f""#; }
+
+    // --- Windows -------------------------------------------------------------------
+    Mod+Q repeat=false { close-window; }
+    Mod+D { maximize-column; }
+    Mod+F { fullscreen-window; }
+    Mod+A { toggle-window-floating; }
+    Mod+Shift+V { switch-focus-between-floating-and-tiling; }
+    Mod+R { switch-preset-column-width; }
+    Mod+Ctrl+R { reset-window-height; }
+    Mod+C { center-column; }
+    Mod+Minus { set-column-width "-10%"; }
+    Mod+Equal { set-column-width "+10%"; }
+    Mod+Shift+Minus { set-window-height "-10%"; }
+    Mod+Shift+Equal { set-window-height "+10%"; }
+    Mod+BracketLeft { consume-or-expel-window-left; }
+    Mod+BracketRight { consume-or-expel-window-right; }
+
+    Mod+Left { focus-column-left; }
+    Mod+Right { focus-column-right; }
+    Mod+Up { focus-window-up; }
+    Mod+Down { focus-window-down; }
+    Mod+H { focus-column-left; }
+    Mod+J { focus-window-down; }
+    Mod+K { focus-window-up; }
+    Mod+L { focus-column-right; }
+    Mod+Home { focus-column-first; }
+    Mod+End { focus-column-last; }
+
+    Mod+Shift+Left { move-column-left; }
+    Mod+Shift+Right { move-column-right; }
+    Mod+Shift+Up { move-window-up; }
+    Mod+Shift+Down { move-window-down; }
+    Mod+Shift+H { move-column-left; }
+    Mod+Shift+J { move-window-down; }
+    Mod+Shift+K { move-window-up; }
+    Mod+Shift+L { move-column-right; }
+    Mod+Ctrl+Home { move-column-to-first; }
+    Mod+Ctrl+End { move-column-to-last; }
+
+    // --- Monitors ------------------------------------------------------------------
+    Mod+Ctrl+Left { focus-monitor-left; }
+    Mod+Ctrl+Right { focus-monitor-right; }
+    Mod+Ctrl+Up { focus-monitor-up; }
+    Mod+Ctrl+Down { focus-monitor-down; }
+    Mod+Ctrl+Shift+Left { move-column-to-monitor-left; }
+    Mod+Ctrl+Shift+Right { move-column-to-monitor-right; }
+    Mod+Ctrl+Shift+Up { move-column-to-monitor-up; }
+    Mod+Ctrl+Shift+Down { move-column-to-monitor-down; }
+
+    // --- Workspaces ----------------------------------------------------------------
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+    Mod+Ctrl+1 { move-column-to-workspace 1; }
+    Mod+Ctrl+2 { move-column-to-workspace 2; }
+    Mod+Ctrl+3 { move-column-to-workspace 3; }
+    Mod+Ctrl+4 { move-column-to-workspace 4; }
+    Mod+Ctrl+5 { move-column-to-workspace 5; }
+    Mod+Ctrl+6 { move-column-to-workspace 6; }
+    Mod+Ctrl+7 { move-column-to-workspace 7; }
+    Mod+Ctrl+8 { move-column-to-workspace 8; }
+    Mod+Ctrl+9 { move-column-to-workspace 9; }
+    Mod+Page_Down { focus-workspace-down; }
+    Mod+Page_Up { focus-workspace-up; }
+    Mod+Ctrl+Page_Down { move-column-to-workspace-down; }
+    Mod+Ctrl+Page_Up { move-column-to-workspace-up; }
+    Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp cooldown-ms=150 { focus-workspace-up; }
+    Mod+Ctrl+WheelScrollDown cooldown-ms=150 { move-column-to-workspace-down; }
+    Mod+Ctrl+WheelScrollUp cooldown-ms=150 { move-column-to-workspace-up; }
+    Mod+WheelScrollRight { focus-column-right; }
+    Mod+WheelScrollLeft { focus-column-left; }
+
+    // --- Volume, brightness, media (dmsh shows the overlays) -----------------------
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "-l" "1.0" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86AudioMicMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+    Mod+Shift+M { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86MonBrightnessUp allow-when-locked=true { spawn "brightnessctl" "set" "5%+"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "--min-value=1" "set" "5%-"; }
+    XF86AudioPlay { spawn "playerctl" "play-pause"; }
+    XF86AudioPause { spawn "playerctl" "play-pause"; }
+    XF86AudioNext { spawn "playerctl" "next"; }
+    XF86AudioPrev { spawn "playerctl" "previous"; }
+    Mod+Ctrl+Space { spawn "playerctl" "play-pause"; }
+    Mod+Shift+P { spawn "playerctl" "play-pause"; }
+    Mod+Shift+N { spawn "playerctl" "next"; }
+    Mod+Shift+B { spawn "playerctl" "previous"; }
+    Mod+Alt+N { spawn "playerctl" "next"; }
+    Mod+Alt+P { spawn "playerctl" "previous"; }
+}

@@ -1,0 +1,147 @@
+// Input, layout, looks and window rules.
+// Docs: https://niri-wm.github.io/niri/Configuration:-Introduction
+
+prefer-no-csd
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+// Mod+Slash shows it.
+hotkey-overlay {
+    skip-at-startup
+}
+
+// Let apps take focus when another app asks for it (e.g. "open with").
+debug {
+    honor-xdg-activation-with-invalid-serial
+}
+
+input {
+    // With no xkb settings niri uses the layout from `localectl`; set your own
+    // in local.kdl: keyboard { xkb { layout "us,ru"; options "grp:alt_shift_toggle"; } }
+    keyboard {
+        repeat-delay 250
+        repeat-rate 50
+    }
+    touchpad {
+        tap
+        tap-button-map "left-right-middle"
+        natural-scroll
+    }
+    mouse {
+        accel-profile "flat"
+        natural-scroll
+    }
+    mod-key "Super"
+    mod-key-nested "Alt"
+    focus-follows-mouse max-scroll-amount="0%"
+}
+
+cursor {
+    hide-when-typing
+}
+
+layout {
+    gaps 11
+    // The wallpaper sits in niri's backdrop (see the layer rule below), so it shows
+    // behind workspaces and in the overview.
+    background-color "transparent"
+    center-focused-column "never"
+    always-center-single-column
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    default-column-width { proportion 0.5; }
+    focus-ring { off; }
+    border { off; }
+    shadow {
+        softness 30
+        spread 5
+        offset x=0 y=5
+        color "#0007"
+    }
+}
+
+overview {
+    zoom 0.75
+}
+
+recent-windows {
+    open-delay-ms 120
+    debounce-ms 750
+    previews {
+        max-height 520
+        max-scale 0.55
+    }
+    binds {
+        Alt+Tab { next-window; }
+        Alt+Shift+Tab { previous-window; }
+    }
+}
+
+animations {
+    workspace-switch {
+        spring damping-ratio=1.0 stiffness=1000 epsilon=0.0001
+    }
+    window-open {
+        duration-ms 220
+        curve "cubic-bezier" 0.05 0.7 0.1 1.0
+    }
+    window-close {
+        duration-ms 160
+        curve "cubic-bezier" 0.2 0.0 0.0 1.0
+    }
+    horizontal-view-movement {
+        spring damping-ratio=1.0 stiffness=900 epsilon=0.0001
+    }
+    window-movement {
+        spring damping-ratio=0.92 stiffness=850 epsilon=0.0001
+    }
+    window-resize {
+        spring damping-ratio=1.0 stiffness=850 epsilon=0.0001
+    }
+    overview-open-close {
+        spring damping-ratio=1.0 stiffness=900 epsilon=0.0001
+    }
+}
+
+environment {
+    QT_QPA_PLATFORM "wayland"
+    ELECTRON_OZONE_PLATFORM_HINT "auto"
+}
+
+// Wallpaper (awww) in the backdrop.
+layer-rule {
+    match namespace="^awww-daemon"
+    place-within-backdrop true
+}
+
+// Rounded windows.
+window-rule {
+    geometry-corner-radius 16
+    clip-to-geometry true
+}
+
+// Games: no clipping, so fullscreen games can use direct scanout.
+window-rule {
+    match app-id=r#"^(gamescope|steam_app_[0-9]+|wine|wine64)$"#
+    geometry-corner-radius 0
+    clip-to-geometry false
+}
+
+window-rule {
+    match is-active=false
+    opacity 0.9
+}
+
+window-rule {
+    match title="^Picture-in-Picture$"
+    open-floating true
+}
+
+window-rule {
+    match app-id="steam" title=r#"^notificationtoasts_\d+_desktop$"#
+    open-floating true
+    open-focused false
+    default-floating-position x=10 y=10 relative-to="bottom-right"
+}

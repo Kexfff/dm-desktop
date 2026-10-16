@@ -1,0 +1,14 @@
+// niri config from dm-desktop (https://github.com/Kexfff/dm-desktop): a minimal
+// desktop around dmsh. Edit the files in dm-desktop/ in the repo and re-run its
+// install.sh, or put your own settings in local.kdl, which is never overwritten.
+
+include "dm-desktop/base.kdl"
+include "dm-desktop/startup.kdl"
+include "dm-desktop/binds.kdl"
+
+// dmsh: autostart and its keybinds. dmsh's install.sh writes this file.
+include "dmsh.kdl"
+
+// Your own settings for this machine: outputs, keyboard layout, apps, overrides.
+// Included last, so a bind or setting here replaces the one above.
+include optional=true "local.kdl"
