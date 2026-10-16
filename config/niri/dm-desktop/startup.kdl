@@ -10,5 +10,8 @@ spawn-at-startup "swayidle" "-w"
 // Wallpaper. awww-daemon restores the last image; set one with `awww img FILE` or Ctrl+Alt+T.
 spawn-at-startup "awww-daemon"
 
-// Clipboard history (Mod+V).
-spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
+// Launcher: elephant is walker's backend (apps, clipboard history, menus, calculator);
+// walker stays resident so it opens instantly. Both run as user services tied to the
+// session, so they restart if they crash: `journalctl --user -u elephant -u walker`.
+spawn-at-startup "systemd-run" "--user" "--collect" "--unit=elephant" "--property=PartOf=graphical-session.target" "--property=Restart=on-failure" "elephant"
+spawn-at-startup "systemd-run" "--user" "--collect" "--unit=walker" "--property=PartOf=graphical-session.target" "--property=Restart=on-failure" "walker" "--gapplication-service"

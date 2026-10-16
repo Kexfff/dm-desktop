@@ -10,21 +10,14 @@ binds {
     Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
     Mod+Shift+O { power-off-monitors; }
     Mod+Alt+L hotkey-overlay-title="Lock the screen" { spawn "loginctl" "lock-session"; }
-    Mod+Shift+Q hotkey-overlay-title="Power menu" { spawn-sh r#"
-        case $(printf '%s\n' Lock Suspend 'Log out' Reboot 'Power off' | fuzzel --dmenu --lines 5 --prompt 'Session: ') in
-            Lock) loginctl lock-session ;;
-            Suspend) systemctl suspend ;;
-            'Log out') niri msg action quit --skip-confirmation ;;
-            Reboot) systemctl reboot ;;
-            'Power off') systemctl poweroff ;;
-        esac"#; }
+    Mod+Shift+Q hotkey-overlay-title="Power menu" { spawn "walker" "-m" "menus:power"; }
 
     // --- Launchers -----------------------------------------------------------------
-    Mod+Space repeat=false hotkey-overlay-title="Launch an app" { spawn "fuzzel"; }
+    Mod+Space repeat=false hotkey-overlay-title="Launch an app" { spawn "walker"; }
     Mod+T hotkey-overlay-title="Terminal" { spawn "kitty"; }
     Mod+Return { spawn "kitty"; }
-    Mod+V hotkey-overlay-title="Clipboard history" { spawn-sh r#"e=$(cliphist list | fuzzel --dmenu --with-nth 2 --prompt 'Clipboard: ') && printf '%s\n' "$e" | cliphist decode | wl-copy"#; }
-    Ctrl+Alt+T hotkey-overlay-title="Pick a wallpaper" { spawn-sh r#"cd ~/Pictures/Wallpapers && f=$(find . -type f | cut -c3- | sort | fuzzel --dmenu --prompt 'Wallpaper: ') && awww img "$f""#; }
+    Mod+V hotkey-overlay-title="Clipboard history" { spawn "walker" "-m" "clipboard"; }
+    Ctrl+Alt+T hotkey-overlay-title="Pick a wallpaper" { spawn "walker" "-m" "menus:wallpapers"; }
 
     // --- Screenshots and recording -------------------------------------------------
     // niri's screenshot UI: pick a region or window, Space or Enter to copy and save,

@@ -1,0 +1,31 @@
+# Power menu (Mod+Shift+Q): `walker -m menus:power`.
+name = "power"
+name_pretty = "Power"
+icon = "system-shutdown"
+action = "%VALUE%"
+fixed_order = true
+
+[[entries]]
+text = "Lock"
+icon = "system-lock-screen"
+value = "loginctl lock-session"
+
+[[entries]]
+text = "Suspend"
+icon = "system-suspend"
+value = "systemctl suspend"
+
+[[entries]]
+text = "Log out"
+icon = "system-log-out"
+value = "niri msg action quit --skip-confirmation"
+
+[[entries]]
+text = "Reboot"
+icon = "system-reboot"
+value = "systemctl reboot"
+
+[[entries]]
+text = "Power off"
+icon = "system-shutdown"
+value = "systemctl poweroff"

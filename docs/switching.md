@@ -12,12 +12,12 @@ What changes:
 | Bar, notifications, OSDs, tray | dmsh |
 | Polkit agent | polkit-kde-agent |
 | Lock screen and idle (screen off 5 min, lock 10 min, lock before sleep) | swayidle + swaylock, same timings |
-| Wallpaper and wallpaper picker | awww, Ctrl+Alt+T |
-| Clipboard overlay (Mod+V) | cliphist + fuzzel, Mod+V. The same history database is used, so old entries stay |
-| Overview / launcher (Mod+Space) | fuzzel, Mod+Space. niri's overview stays on Mod+Tab |
+| Wallpaper and wallpaper picker | awww, and walker with previews, Ctrl+Alt+T |
+| Clipboard overlay (Mod+V) | walker, Mod+V. History starts empty: walker keeps its own, separate from iNiR's cliphist |
+| Overview / launcher (Mod+Space) | walker, Mod+Space. niri's overview stays on Mod+Tab |
 | Region menu (Mod+Shift+S) | niri's screenshot UI, Mod+Shift+S or Print |
 | OCR (Mod+Shift+X), recording (Mod+Shift+R) | Same keys, grim/slurp/tesseract/wf-recorder |
-| Session menu (Mod+Shift+Q) | fuzzel power menu, Mod+Shift+Q |
+| Session menu (Mod+Shift+Q) | walker power menu, Mod+Shift+Q |
 | Volume, brightness, media keys | wpctl, brightnessctl, playerctl (dmsh shows the OSD) |
 | Close with confirmation (Mod+Q) | niri's plain close-window |
 | Cheatsheet (Mod+Slash) | niri's hotkey overlay |
@@ -45,7 +45,7 @@ reloads at once, so the iNiR keybinds stop working right after it. Log out right
    This builds dmsh into `~/.local/bin` and writes `~/.config/niri/dmsh.kdl`.
 
 2. **Check the starting point** for the way back. The dm-desktop installer saves your
-   current `config.kdl` and `fuzzel.ini` by itself; this is just a quick look:
+   current `config.kdl` by itself; this is just a quick look:
 
    ```sh
    ls ~/.config/niri ~/.config/systemd/user/niri.service.wants
@@ -54,7 +54,8 @@ reloads at once, so the iNiR keybinds stop working right after it. Log out right
    You should see `config.kdl`, `config.d/`, `dmsh.kdl` and the `inir.service` link.
 
 3. **Install dm-desktop.** It lists the files it writes and asks before installing
-   packages and before writing:
+   packages and before writing. walker comes from the CachyOS repo; elephant and its
+   provider plugins come from the AUR through `yay`, which asks for your password itself:
 
    ```sh
    cd ~/Documents/Projects/dm-desktop && ./install.sh
@@ -123,7 +124,7 @@ reloads at once, so the iNiR keybinds stop working right after it. Log out right
 ### Check
 
 ```sh
-pgrep -a 'dmsh|swayidle|awww-daemon|polkit-kde|wl-paste'   # all five running
+pgrep -a 'dmsh|swayidle|awww-daemon|polkit-kde|elephant|walker'   # all six running
 systemctl --user is-active inir.service                      # inactive: iNiR is off
 niri validate                                               # config is valid
 ```
@@ -142,7 +143,7 @@ fine, but if one is missing, restart that app.
 From the dmsh session, or from a text console (Ctrl+Alt+F3) if the graphical session
 is unusable:
 
-1. **Restore the old files**: iNiR's `config.kdl` and your `fuzzel.ini` come back
+1. **Restore the old files**: iNiR's `config.kdl` comes back
    byte for byte. dm-desktop's files, swayidle and swaylock configs go away:
 
    ```sh
@@ -150,7 +151,8 @@ is unusable:
    ```
 
    `local.kdl` stays, but iNiR's config doesn't include it, so it does nothing. Delete
-   it if you like.
+   it if you like. The packages stay installed and do nothing; iNiR's clipboard
+   history was never touched.
 
 2. **Start iNiR with niri again**:
 

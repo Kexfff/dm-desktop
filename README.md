@@ -9,16 +9,16 @@ and a niri config that ties them together:
 |---|---|---|
 | Polkit agent (password prompts from apps) | polkit-kde-agent | — |
 | Idle and lock | swayidle + swaylock | Mod+Alt+L to lock |
-| Wallpaper | awww (remembers the last image) | Ctrl+Alt+T to pick one |
-| Clipboard history | wl-paste + cliphist | Mod+V |
-| Launcher | fuzzel | Mod+Space |
+| Wallpaper | awww (remembers the last image) | Ctrl+Alt+T to pick one, with previews |
+| Clipboard history (text and images) | walker | Mod+V |
+| Launcher, calculator, emoji | [walker](https://github.com/abenz1267/walker) | Mod+Space |
 | Screenshots | niri's built-in screenshot UI | Print, Mod+Shift+S |
 | Text from a region (OCR) | grim + slurp + tesseract | Mod+Shift+X |
 | Screen recording | slurp + wf-recorder | Mod+Shift+R (again to stop) |
-| Power menu | fuzzel | Mod+Shift+Q |
+| Power menu | walker | Mod+Shift+Q |
 
 There is no daemon or script of its own: just config files for niri, swayidle,
-swaylock and fuzzel, plus an install script. Mod+Slash lists the keys.
+swaylock and walker, plus an install script. Mod+Slash lists the keys.
 
 ## Install
 
@@ -36,11 +36,11 @@ It lists what it will do and asks first. It:
 - installs the tools above that are missing (pacman, apt or dnf), and asks separately
   about the optional ones (tesseract for OCR, wf-recorder for recording);
 - copies `config/` into `~/.config`. A file of yours that this replaces (usually
-  `niri/config.kdl` and `fuzzel/fuzzel.ini`) is saved under `~/.local/state/dm-desktop`;
+  `niri/config.kdl`) is saved under `~/.local/state/dm-desktop`;
 - checks the resulting niri config with `niri validate` before writing anything.
 
 Then log out and back in: niri starts the daemons (polkit agent, swayidle, awww-daemon,
-the clipboard watcher) at login. Set a wallpaper once with `awww img FILE` or
+elephant and walker) at login. Set a wallpaper once with `awww img FILE` or
 Ctrl+Alt+T (it lists `~/Pictures/Wallpapers`). awww restores it at every login after
 that.
 
@@ -61,7 +61,8 @@ the ones it added. Log out and back in to stop the daemons.
 ~/.config/niri/local.kdl               yours, optional, never touched
 ~/.config/swayidle/config              screen off after 5 min, lock after 10, lock before sleep
 ~/.config/swaylock/config              lock screen colors
-~/.config/fuzzel/fuzzel.ini            launcher look (dark, like dmsh)
+~/.config/walker/config.toml           launcher settings and its theme (black, like dmsh)
+~/.config/elephant/menus/              the power menu and the wallpaper picker
 ```
 
 Put settings for this machine in `~/.config/niri/local.kdl`: outputs, keyboard layout,
@@ -90,7 +91,27 @@ binds {
 ```
 
 The terminal is kitty (Mod+T, Mod+Return). Use another one by binding Mod+T and
-Mod+Return in local.kdl, and change `terminal=` in fuzzel.ini.
+Mod+Return in local.kdl.
+
+## The launcher
+
+[walker](https://github.com/abenz1267/walker) is the front end;
+[elephant](https://github.com/abenz1267/elephant) is its backend, with one plugin per
+provider. This setup uses six: desktop apps, clipboard, menus, calculator, symbols and
+the provider list. On Arch, walker is in the CachyOS repos and the AUR, and elephant and
+its plugins are in the AUR (`elephant-bin` plus `elephant-<provider>-bin`, from the same
+build). install.sh installs them with `paru` or `yay` if you have one. Elsewhere, install
+them by hand.
+
+While searching: `=` calculator, `:` clipboard, `.` symbols and emoji, `;` all providers.
+In the clipboard view, Ctrl+P pins an entry and Ctrl+D removes it.
+
+Both run as user services started by niri (`systemd-run`), tied to the session, so
+they restart if they crash. Logs: `journalctl --user -u elephant -u walker`.
+
+Elephant's README says its development is on hold (September 2026); walker itself is
+still maintained. If elephant stops working with a future walker, fuzzel plus cliphist
+is the fallback this repo used before.
 
 ## Notes
 

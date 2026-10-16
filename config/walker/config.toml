@@ -1,0 +1,15 @@
+# walker: app launcher (Mod+Space), clipboard history (Mod+V), power menu (Mod+Shift+Q)
+# and wallpapers (Ctrl+Alt+T). Merged over walker's defaults:
+# https://github.com/abenz1267/walker/blob/master/resources/config.toml
+# Prefixes while searching: = calculator, : clipboard, . symbols and emoji, ; providers.
+theme = "dmsh"
+
+[providers]
+default = ["desktopapplications", "calc"]
+empty = ["desktopapplications"]
+
+[placeholders]
+"default" = { input = "Search", list = "No results" }
+"clipboard" = { input = "Clipboard", list = "Nothing copied yet" }
+"menus:power" = { input = "Power", list = "" }
+"menus:wallpapers" = { input = "Wallpaper", list = "No images in ~/Pictures/Wallpapers" }

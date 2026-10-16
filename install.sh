@@ -74,6 +74,7 @@ if [ ! -f "$config/niri/dmsh.kdl" ]; then
 fi
 
 # --- Dependencies -------------------------------------------------------------------
+elephant_providers="desktopapplications clipboard menus calc providerlist symbols"
 install_packages() {
     if command -v pacman >/dev/null; then
         $sudo pacman -S --needed --noconfirm "$@"
@@ -109,8 +110,6 @@ if [ "$deps" = 1 ]; then
     need swayidle swayidle
     need swaylock swaylock
     need awww awww
-    need fuzzel fuzzel
-    need cliphist cliphist
     need wl-copy wl-clipboard
     need grim grim
     need slurp slurp
@@ -122,8 +121,37 @@ if [ "$deps" = 1 ]; then
         optional="$optional $(pkg "tesseract tesseract-data-eng" "tesseract-ocr tesseract-ocr-eng" "tesseract tesseract-langpack-eng")"
     command -v wf-recorder >/dev/null || optional="$optional wf-recorder"
 
+    # walker (the launcher) and elephant, its backend with one plugin per provider, aren't
+    # in the main repos. On Arch they're in the AUR; CachyOS also packages walker.
+    aur=""
+    if command -v pacman >/dev/null; then
+        if ! command -v walker >/dev/null; then
+            if pacman -Si walker >/dev/null 2>&1; then missing="$missing walker"; else aur="$aur walker-bin"; fi
+        fi
+        # Provider plugins must come from the same build as elephant itself.
+        suffix=-bin
+        command -v elephant >/dev/null && ! pacman -Q elephant-bin >/dev/null 2>&1 && suffix=
+        command -v elephant >/dev/null || aur="$aur elephant$suffix"
+        for p in $elephant_providers; do
+            [ -e "/etc/xdg/elephant/providers/$p.so" ] || [ -e "$config/elephant/providers/$p.so" ] ||
+                aur="$aur elephant-$p$suffix"
+        done
+    elif ! command -v walker >/dev/null || ! command -v elephant >/dev/null; then
+        say "Install walker and elephant (with the providers: $elephant_providers) by hand:"
+        note "https://github.com/abenz1267/walker, https://github.com/abenz1267/elephant"
+    fi
+
     if [ -n "$missing" ] && ask "Install packages:$missing?"; then
         install_packages $missing || say "Some packages failed to install; the binds that need them won't work."
+    fi
+    if [ -n "$aur" ]; then
+        helper=$(command -v paru || command -v yay || true)
+        if [ -z "$helper" ]; then
+            say "These come from the AUR; install them with an AUR helper:$aur"
+        elif ask "Install from the AUR with ${helper##*/}:$aur?"; then
+            if [ "$yes" = 1 ]; then set -- --noconfirm; else set --; fi
+            "$helper" -S --needed "$@" $aur || say "AUR install failed; the launcher binds won't work until walker runs."
+        fi
     fi
     if [ -n "$optional" ]; then
         say "Optional: text from a region (Mod+Shift+X) and screen recording (Mod+Shift+R) need:$optional"
@@ -166,6 +194,31 @@ if ! ask "Go ahead?"; then
     exit 0
 fi
 
+# Undo files an earlier version installed that this one no longer ships.
+if [ -f "$manifest" ]; then
+    : > "$manifest.new"
+    while read -r kind path; do
+        if [ "$kind" != dir ] && ! printf '%s\n' $files | grep -qxF "$path"; then
+            if [ "$kind" = replaced ]; then
+                cp -Pp "$state/backup/$path" "$config/$path.dm-desktop-new"
+                mv -f "$config/$path.dm-desktop-new" "$config/$path"
+                rm -f "$state/backup/$path"
+            else
+                rm -f "$config/$path"
+            fi
+            note "$path: no longer used, $( [ "$kind" = replaced ] && echo "yours is back" || echo removed)"
+        else
+            echo "$kind $path" >> "$manifest.new"
+        fi
+    done < "$manifest"
+    : > "$manifest"
+    tac "$manifest.new" | while read -r kind path; do
+        if [ "$kind" = dir ] && rmdir "$config/$path" 2>/dev/null; then continue; fi
+        echo "$kind $path"
+    done | tac > "$manifest"
+    rm -f "$manifest.new"
+fi
+
 mkdir -p "$state/backup"
 touch "$manifest"
 for f in $files; do
@@ -197,5 +250,5 @@ for f in $files; do
 done
 
 say "Installed. Log out and back in to start the polkit agent, idle/lock, wallpaper and"
-note "clipboard daemons (niri starts them). Machine-specific settings (outputs, keyboard"
+note "launcher daemons (niri starts them). Machine-specific settings (outputs, keyboard"
 note "layout, your apps) go in $config/niri/local.kdl. Undo with: $0 --uninstall"
