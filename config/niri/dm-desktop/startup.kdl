@@ -4,9 +4,9 @@
 // Polkit agent, for password prompts from apps. The path differs by distro.
 spawn-sh-at-startup r#"for a in /usr/lib/polkit-kde-authentication-agent-1 /usr/libexec/polkit-kde-authentication-agent-1 /usr/lib/*/libexec/polkit-kde-authentication-agent-1; do [ -x "$a" ] && exec "$a"; done"#
 
-// Idle and lock: screen off, lock, lock before sleep. Timings: ~/.config/hypr/hypridle.conf,
-// the lock screen: ~/.config/hypr/hyprlock.conf.
-spawn-at-startup "hypridle"
+// Idle and lock: screen off, lock, lock before sleep. Timings: ~/.config/swayidle/config,
+// the lock screen: ~/.config/hypr/hyprlock.conf. -w holds suspend until the lock is up.
+spawn-at-startup "swayidle" "-w"
 
 // Wallpaper. awww-daemon restores the last image; set one with `awww img FILE` or Ctrl+Alt+T.
 spawn-at-startup "awww-daemon"

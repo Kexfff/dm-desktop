@@ -3,12 +3,16 @@
 A minimal niri desktop around [dmsh](https://github.com/Kexfff/DM-Shell). dmsh is the
 shell (bar, notifications, OSDs, tray, battery, quick controls) and deliberately leaves
 out the rest of a desktop. This repo adds those pieces, using small standard tools,
-and a niri config that ties them together:
+and a niri config that ties them together.
+
+It's my personal setup: it also carries my laptop's niri settings (`local.kdl`) and my
+dmsh config. Change those two for another machine.
+
 
 | Piece | Tool | Keys |
 |---|---|---|
 | Polkit agent (password prompts from apps) | polkit-kde-agent | — |
-| Idle and lock screen | hypridle + hyprlock | Mod+Alt+L to lock |
+| Idle and lock screen | swayidle + hyprlock | Mod+Alt+L to lock |
 | Wallpaper | awww (remembers the last image) | Ctrl+Alt+T to pick one, with previews |
 | Clipboard history (text and images) | walker | Mod+V |
 | Launcher, calculator, emoji | [walker](https://github.com/abenz1267/walker) | Mod+Space |
@@ -17,7 +21,7 @@ and a niri config that ties them together:
 | Screen recording | slurp + wf-recorder | Mod+Shift+R (again to stop) |
 | Power menu | walker | Mod+Shift+Q |
 
-There is no daemon or script of its own: just config files for niri, hypridle,
+There is no daemon or script of its own: just config files for niri, swayidle,
 hyprlock and walker, plus an install script. Mod+Slash lists the keys.
 
 ## Install
@@ -39,7 +43,7 @@ It lists what it will do and asks first. It:
   `niri/config.kdl`) is saved under `~/.local/state/dm-desktop`;
 - checks the resulting niri config with `niri validate` before writing anything.
 
-Then log out and back in: niri starts the daemons (polkit agent, hypridle, awww-daemon,
+Then log out and back in: niri starts the daemons (polkit agent, swayidle, awww-daemon,
 elephant and walker) at login. Set a wallpaper once with `awww img FILE` or
 Ctrl+Alt+T (it lists `~/Pictures/Wallpapers`). awww restores it at every login after
 that.
@@ -58,17 +62,19 @@ the ones it added. Log out and back in to stop the daemons.
 ~/.config/niri/dm-desktop/startup.kdl  the daemons started at login
 ~/.config/niri/dm-desktop/binds.kdl    keybinds
 ~/.config/niri/dmsh.kdl                dmsh's autostart and binds (from dmsh)
-~/.config/niri/local.kdl               yours, optional, never touched
-~/.config/hypr/hypridle.conf           screen off after 5 min, lock after 10, lock before sleep
+~/.config/niri/local.kdl               this machine: keyboard layout, outputs, theming, apps
+~/.config/dmsh/config.kdl              dmsh's look (pill and reserved height)
+~/.config/swayidle/config              screen off after 5 min, lock after 10, lock before sleep
+~/.config/swayidle/lock                starts hyprlock and waits until the screen is locked
 ~/.config/hypr/hyprlock.conf           the lock screen: blurred desktop, clock, password pill
 ~/.config/walker/config.toml           launcher settings and its theme (black, like dmsh)
 ~/.config/elephant/menus/              the power menu and the wallpaper picker
 ```
 
-Put settings for this machine in `~/.config/niri/local.kdl`: outputs, keyboard layout,
-cursor theme, your browser and file manager keys. It's included last, so a bind there
+Settings for one machine go in `config/niri/local.kdl`: outputs, keyboard layout,
+cursor theme, the browser and file manager keys. It's included last, so a bind there
 replaces the same bind above, and settings in sections like `input {}` are merged in.
-For example:
+For another machine, replace it with something like:
 
 ```kdl
 input {
@@ -119,14 +125,15 @@ is the fallback this repo used before.
   `polkit-kde-authentication-agent-1` (Arch, Fedora, Debian). Run only one polkit
   agent; a second one fails to register.
 - **Lock**: Mod+Alt+L, the idle timer and suspend all go through
-  `loginctl lock-session`; hypridle starts hyprlock when that happens. Apps that ask
+  `loginctl lock-session`; swayidle starts hyprlock when that happens. Apps that ask
   to stay awake pause the idle timers, whether they ask through Wayland (browsers playing
   video, dmsh's Keep awake) or D-Bus (niri itself answers those).
-- **Lock before sleep**: hypridle's wait-until-locked mode needs a Hyprland protocol
-  that niri doesn't have, so suspend doesn't wait for the lock. hypridle starts hyprlock
-  directly instead, and hyprlock asks niri to lock in about 0.1 s (measured in a VM, via
-  the slower `loginctl` path), normally before the system is done suspending. If you
-  ever see the desktop for a moment after waking, that's this race.
+- **Lock before sleep**: swayidle holds suspend (`-w`) until `~/.config/swayidle/lock`
+  returns, and that script returns once hyprlock logs that niri confirmed the lock
+  (about 0.3 s), or after 3 s at most. So the lock is already up when the lid opens.
+  hypridle can't do this on niri: its wait-for-lock needs a Hyprland-only protocol, and
+  without it suspend went ahead before the lock, leaving the desktop visible for about a
+  second after opening the lid.
 - **Screenshots**: niri's UI copies the image to the clipboard and saves it to
   `~/Pictures/Screenshots`. Ctrl+C in the UI copies without saving.
 - **Recording** captures system audio (the default output's monitor) and saves to

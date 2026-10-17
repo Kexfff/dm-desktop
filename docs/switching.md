@@ -11,7 +11,7 @@ What changes:
 |---|---|
 | Bar, notifications, OSDs, tray | dmsh |
 | Polkit agent | polkit-kde-agent |
-| Lock screen and idle (screen off 5 min, lock 10 min, lock before sleep) | hypridle + hyprlock, same timings; the lock shows the blurred desktop, clock and date |
+| Lock screen and idle (screen off 5 min, lock 10 min, lock before sleep) | swayidle + hyprlock, same timings; the lock shows the blurred desktop, clock and date |
 | Wallpaper and wallpaper picker | awww, and walker with previews, Ctrl+Alt+T |
 | Clipboard overlay (Mod+V) | walker, Mod+V. History starts empty: walker keeps its own, separate from iNiR's cliphist |
 | Overview / launcher (Mod+Space) | walker, Mod+Space. niri's overview stays on Mod+Tab |
@@ -61,57 +61,11 @@ reloads at once, so the iNiR keybinds stop working right after it. Log out right
    cd ~/Documents/Projects/dm-desktop && ./install.sh
    ```
 
-4. **Add this laptop's settings** as `~/.config/niri/local.kdl`. These are the
-   machine-specific parts of the old config: keyboard layout, cursor, the VRR output,
-   Qt/KDE theming, Dolphin's "Open with" menus, niri-focused-booster, browser and file
-   manager keys, and OCR with Russian:
-
-   ```kdl
-   input {
-       keyboard {
-           xkb {
-               layout "us,ru"
-               options "grp:alt_shift_toggle"
-           }
-       }
-   }
-
-   cursor {
-       xcursor-theme "capitaine-cursors-light"
-       xcursor-size 24
-   }
-
-   output "eDP-1" {
-       variable-refresh-rate
-   }
-
-   environment {
-       XDG_MENU_PREFIX "plasma-"
-       QT_QPA_PLATFORMTHEME "kde"
-       QT_STYLE_OVERRIDE "Darkly"
-   }
-   spawn-sh-at-startup "systemctl --user import-environment XDG_MENU_PREFIX && kbuildsycoca6"
-   spawn-sh-at-startup "command -v niri-focused-booster >/dev/null && [ -r /sys/fs/cgroup/dmem.capacity ] && exec niri-focused-booster"
-
-   // KDE's XEmbed tray bridge (autostarted) shows a transient X11 window; keep it invisible.
-   window-rule {
-       match app-id=r#"^xembedsniproxy$"#
-       open-floating true
-       open-focused false
-       opacity 0.0
-       focus-ring { off; }
-       border { off; }
-       shadow { off; }
-   }
-
-   binds {
-       Mod+E hotkey-overlay-title="Files" { spawn "dolphin"; }
-       Mod+W hotkey-overlay-title="Browser" { spawn "floorp"; }
-       Mod+Shift+X hotkey-overlay-title="Copy text from a region (OCR)" { spawn-sh r#"t=$(grim -g "$(slurp)" - | tesseract - - -l eng+rus 2>/dev/null) && [ -n "$t" ] && printf '%s' "$t" | wl-copy && notify-send -a OCR 'Text copied' "$t""#; }
-   }
-   ```
-
-   Then check it: `niri validate` should say "config is valid".
+4. **Check this laptop's settings.** install.sh also wrote `~/.config/niri/local.kdl`
+   (keyboard layout, cursor, the VRR output, Qt/KDE theming, Dolphin's "Open with"
+   menus, niri-focused-booster, browser and file manager keys, OCR with Russian) and
+   `~/.config/dmsh/config.kdl`, both from this repo. `niri validate` should say
+   "config is valid".
 
 5. **Stop iNiR from starting at login**. This removes only the link that starts it with
    niri; the unit file stays. Don't stop it now, so the current session keeps working
@@ -135,7 +89,7 @@ reloads at once, so the iNiR keybinds stop working right after it. Log out right
 ### Check
 
 ```sh
-pgrep -a 'dmsh|hypridle|awww-daemon|polkit-kde|elephant|walker'   # all six running
+pgrep -a 'dmsh|swayidle|awww-daemon|polkit-kde|elephant|walker'   # all six running
 systemctl --user is-active inir.service                      # inactive: iNiR is off
 niri validate                                               # config is valid
 ```
@@ -155,15 +109,15 @@ From the dmsh session, or from a text console (Ctrl+Alt+F3) if the graphical ses
 is unusable:
 
 1. **Restore the old files**: iNiR's `config.kdl` comes back
-   byte for byte. dm-desktop's niri files and the hypr, walker and elephant configs go away:
+   byte for byte. dm-desktop's niri files and the swayidle, hypr, walker, elephant and dmsh configs go
+   away (or go back to what you had):
 
    ```sh
    ~/Documents/Projects/dm-desktop/install.sh --uninstall
    ```
 
-   `local.kdl` stays, but iNiR's config doesn't include it, so it does nothing. Delete
-   it if you like. The packages stay installed and do nothing; iNiR's clipboard
-   history was never touched.
+   The packages stay installed and do nothing; iNiR's clipboard history was never
+   touched.
 
 2. **Start iNiR with niri again**:
 

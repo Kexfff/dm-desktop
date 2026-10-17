@@ -1,0 +1,10 @@
+# swayidle, started by niri (see niri/dm-desktop/startup.kdl). man swayidle
+# Screen off after 5 minutes, lock after 10, and lock before going to sleep. Any input
+# turns the screen back on. Apps that ask to stay awake (video, dmsh's Keep awake)
+# pause the timers. The lock screen is hyprlock: ~/.config/hypr/hyprlock.conf.
+timeout 300 'niri msg action power-off-monitors' resume 'niri msg action power-on-monitors'
+timeout 600 'loginctl lock-session'
+# Mod+Alt+L, the power menu and the timer above all go through `loginctl lock-session`.
+lock '~/.config/swayidle/lock'
+before-sleep '~/.config/swayidle/lock'
+after-resume 'niri msg action power-on-monitors'

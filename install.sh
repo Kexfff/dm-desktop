@@ -107,7 +107,7 @@ polkit_agent() {
 if [ "$deps" = 1 ]; then
     missing=""
     need() { command -v "$1" >/dev/null || missing="$missing $2"; }
-    need hypridle hypridle
+    need swayidle swayidle
     need hyprlock hyprlock
     need awww awww
     need wl-copy wl-clipboard

@@ -40,7 +40,10 @@ cursor {
 }
 
 layout {
-    gaps 11
+    gaps 6
+    struts {
+        top -4
+    }
     // The wallpaper sits in niri's backdrop (see the layer rule below), so it shows
     // behind workspaces and in the overview.
     background-color "transparent"

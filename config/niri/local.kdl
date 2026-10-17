@@ -1,0 +1,47 @@
+// Settings for my laptop (this repo is a personal setup). Included last by config.kdl,
+// so binds here replace the ones above and sections are merged in.
+
+input {
+    keyboard {
+        xkb {
+            layout "us,ru"
+            options "grp:alt_shift_toggle"
+        }
+    }
+}
+
+cursor {
+    xcursor-theme "capitaine-cursors-light"
+    xcursor-size 24
+}
+
+output "eDP-1" {
+    variable-refresh-rate
+}
+
+// KDE/Qt look and Dolphin's "Open with" menus.
+environment {
+    XDG_MENU_PREFIX "plasma-"
+    QT_QPA_PLATFORMTHEME "kde"
+    QT_STYLE_OVERRIDE "Darkly"
+}
+spawn-sh-at-startup "systemctl --user import-environment XDG_MENU_PREFIX && kbuildsycoca6"
+spawn-sh-at-startup "command -v niri-focused-booster >/dev/null && [ -r /sys/fs/cgroup/dmem.capacity ] && exec niri-focused-booster"
+
+// KDE's XEmbed tray bridge (autostarted) shows a transient X11 window; keep it invisible.
+window-rule {
+    match app-id=r#"^xembedsniproxy$"#
+    open-floating true
+    open-focused false
+    opacity 0.0
+    focus-ring { off; }
+    border { off; }
+    shadow { off; }
+}
+
+binds {
+    Mod+E hotkey-overlay-title="Files" { spawn "dolphin"; }
+    Mod+W hotkey-overlay-title="Browser" { spawn "floorp"; }
+    // OCR in English and Russian.
+    Mod+Shift+X hotkey-overlay-title="Copy text from a region (OCR)" { spawn-sh r#"t=$(grim -g "$(slurp)" - | tesseract - - -l eng+rus 2>/dev/null) && [ -n "$t" ] && printf '%s' "$t" | wl-copy && notify-send -a OCR 'Text copied' "$t""#; }
+}
