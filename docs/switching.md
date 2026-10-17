@@ -93,9 +93,20 @@ reloads at once, so the iNiR keybinds stop working right after it. Log out right
    spawn-sh-at-startup "systemctl --user import-environment XDG_MENU_PREFIX && kbuildsycoca6"
    spawn-sh-at-startup "command -v niri-focused-booster >/dev/null && [ -r /sys/fs/cgroup/dmem.capacity ] && exec niri-focused-booster"
 
+   // KDE's XEmbed tray bridge (autostarted) shows a transient X11 window; keep it invisible.
+   window-rule {
+       match app-id=r#"^xembedsniproxy$"#
+       open-floating true
+       open-focused false
+       opacity 0.0
+       focus-ring { off; }
+       border { off; }
+       shadow { off; }
+   }
+
    binds {
        Mod+E hotkey-overlay-title="Files" { spawn "dolphin"; }
-       Mod+W hotkey-overlay-title="Browser" { spawn "floorp-bin"; }
+       Mod+W hotkey-overlay-title="Browser" { spawn "floorp"; }
        Mod+Shift+X hotkey-overlay-title="Copy text from a region (OCR)" { spawn-sh r#"t=$(grim -g "$(slurp)" - | tesseract - - -l eng+rus 2>/dev/null) && [ -n "$t" ] && printf '%s' "$t" | wl-copy && notify-send -a OCR 'Text copied' "$t""#; }
    }
    ```
