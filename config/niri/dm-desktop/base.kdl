@@ -42,7 +42,7 @@ cursor {
 layout {
     gaps 6
     struts {
-        top -4
+        top -6
     }
     // The wallpaper sits in niri's backdrop (see the layer rule below), so it shows
     // behind workspaces and in the overview.

@@ -15,7 +15,7 @@ theme {
     accent-colors low="#8e8e93" normal="#f5f5f7" high="#ff9f0a" critical="#ff453a"
 
     // Space reserved at the top of each output; windows tile below it.
-    reserved-height 22
+    reserved-height 24
     pill-height 22
     // Corner radius of expanded islands (collapsed pills are fully round).
     corner-radius 26
@@ -23,8 +23,9 @@ theme {
     center-idle-width 100
     center-min-width 160
     center-expanded-width 400
-    right-expanded-width 340
+    right-expanded-width 380
     right-margin 8
+    font "JetBrainsMono Nerd Font"
 }
 
 clock {

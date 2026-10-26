@@ -63,7 +63,7 @@ the ones it added. Log out and back in to stop the daemons.
 ~/.config/niri/dm-desktop/binds.kdl    keybinds
 ~/.config/niri/dmsh.kdl                dmsh's autostart and binds (from dmsh)
 ~/.config/niri/local.kdl               this machine: keyboard layout, outputs, theming, apps
-~/.config/dmsh/config.kdl              dmsh's look (pill and reserved height)
+~/.config/dmsh/config.kdl              dmsh's look (sizes, font)
 ~/.config/swayidle/config              screen off after 5 min, lock after 10, lock before sleep
 ~/.config/swayidle/lock                starts hyprlock and waits until the screen is locked
 ~/.config/hypr/hyprlock.conf           the lock screen: blurred desktop, clock, password pill
