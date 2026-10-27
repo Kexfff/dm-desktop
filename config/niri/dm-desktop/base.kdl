@@ -111,6 +111,9 @@ animations {
 environment {
     QT_QPA_PLATFORM "wayland"
     ELECTRON_OZONE_PLATFORM_HINT "auto"
+    XDG_MENU_PREFIX "plasma-"
+    QT_QPA_PLATFORMTHEME "kde"
+    QT_STYLE_OVERRIDE "Darkly"
 }
 
 // Wallpaper (awww) in the backdrop.
@@ -147,4 +150,14 @@ window-rule {
     open-floating true
     open-focused false
     default-floating-position x=10 y=10 relative-to="bottom-right"
+}
+
+window-rule {
+    match app-id=r#"^xembedsniproxy$"#
+    open-floating true
+    open-focused false
+    opacity 0.0
+    focus-ring { off; }
+    border { off; }
+    shadow { off; }
 }

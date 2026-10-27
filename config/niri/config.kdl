@@ -11,3 +11,6 @@ include "dmsh.kdl"
 // Settings for this machine: outputs, keyboard layout, apps, overrides.
 // Included last, so a bind or setting here replaces the one above.
 include "local.kdl"
+
+// Settings made in DM Manager. Keep this last so they win over the files above.
+include optional=true "dm-manager.kdl"

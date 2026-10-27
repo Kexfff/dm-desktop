@@ -61,10 +61,11 @@ reloads at once, so the iNiR keybinds stop working right after it. Log out right
    cd ~/Documents/Projects/dm-desktop && ./install.sh
    ```
 
-4. **Check this laptop's settings.** install.sh also wrote `~/.config/niri/local.kdl`
-   (keyboard layout, cursor, the VRR output, Qt/KDE theming, Dolphin's "Open with"
-   menus, niri-focused-booster, browser and file manager keys, OCR with Russian) and
-   `~/.config/dmsh/config.kdl`, both from this repo. `niri validate` should say
+4. **Check this laptop's settings.** The niri files from this repo already carry
+   Qt/KDE theming, Dolphin's "Open with" menus, niri-focused-booster, browser and file
+   manager keys and OCR with Russian; install.sh also wrote `~/.config/niri/local.kdl`
+   (the VRR output) and `~/.config/dmsh/config.kdl`. Keyboard layout, cursor and
+   touchpad come from DM Manager's `dm-manager.kdl`. `niri validate` should say
    "config is valid".
 
 5. **Stop iNiR from starting at login**. This removes only the link that starts it with

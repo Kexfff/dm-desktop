@@ -5,8 +5,10 @@ shell (bar, notifications, OSDs, tray, battery, quick controls) and deliberately
 out the rest of a desktop. This repo adds those pieces, using small standard tools,
 and a niri config that ties them together.
 
-It's my personal setup: it also carries my laptop's niri settings (`local.kdl`) and my
-dmsh config. Change those two for another machine.
+It's my personal setup: the niri files carry my preferences (KDE/Qt theming, Dolphin and
+Floorp keys, OCR in English and Russian), `local.kdl` my laptop's output, and there's my
+dmsh config. Keyboard layout, cursor and touchpad come from
+[DM Manager](https://github.com/Kexfff/dm-manager) instead.
 
 
 | Piece | Tool | Keys |
@@ -62,7 +64,8 @@ the ones it added. Log out and back in to stop the daemons.
 ~/.config/niri/dm-desktop/startup.kdl  the daemons started at login
 ~/.config/niri/dm-desktop/binds.kdl    keybinds
 ~/.config/niri/dmsh.kdl                dmsh's autostart and binds (from dmsh)
-~/.config/niri/local.kdl               this machine: keyboard layout, outputs, theming, apps
+~/.config/niri/local.kdl               this machine's outputs and overrides
+~/.config/niri/dm-manager.kdl          keyboard, cursor, touchpad (DM Manager writes it; optional)
 ~/.config/dmsh/config.kdl              dmsh's look (sizes, font)
 ~/.config/swayidle/config              screen off after 5 min, lock after 10, lock before sleep
 ~/.config/swayidle/lock                starts hyprlock and waits until the screen is locked
@@ -71,10 +74,10 @@ the ones it added. Log out and back in to stop the daemons.
 ~/.config/elephant/menus/              the power menu and the wallpaper picker
 ```
 
-Settings for one machine go in `config/niri/local.kdl`: outputs, keyboard layout,
-cursor theme, the browser and file manager keys. It's included last, so a bind there
-replaces the same bind above, and settings in sections like `input {}` are merged in.
-For another machine, replace it with something like:
+Settings for one machine go in `config/niri/local.kdl`, which is included after the
+dm-desktop files: a bind there replaces the same bind above, and settings in sections
+like `input {}` are merged in. `dm-manager.kdl` comes last of all, so what DM Manager
+sets wins; without DM Manager, put the keyboard layout in local.kdl:
 
 ```kdl
 input {
@@ -89,15 +92,10 @@ input {
 output "eDP-1" {
     variable-refresh-rate
 }
-
-binds {
-    Mod+W { spawn "firefox"; }
-    Mod+E { spawn "dolphin"; }
-}
 ```
 
-The terminal is kitty (Mod+T, Mod+Return). Use another one by binding Mod+T and
-Mod+Return in local.kdl.
+The terminal is kitty (Mod+T, Mod+Return), the browser Floorp (Mod+W), files Dolphin
+(Mod+E); bind other ones in local.kdl.
 
 ## The launcher
 

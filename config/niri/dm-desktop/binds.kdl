@@ -3,6 +3,10 @@
 // Docs: https://niri-wm.github.io/niri/Configuration:-Key-Bindings
 
 binds {
+    // --- Apps
+    Mod+E hotkey-overlay-title="Files" { spawn "dolphin"; }
+    Mod+W hotkey-overlay-title="Browser" { spawn "floorp"; }
+
     // --- Session -------------------------------------------------------------------
     Mod+Slash { show-hotkey-overlay; }
     Mod+Tab repeat=false { toggle-overview; }
@@ -26,7 +30,7 @@ binds {
     Ctrl+Print { screenshot-screen; }
     Mod+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }
-    Mod+Shift+X hotkey-overlay-title="Copy text from a region (OCR)" { spawn-sh r#"t=$(grim -g "$(slurp)" - | tesseract - - -l eng 2>/dev/null) && [ -n "$t" ] && printf '%s' "$t" | wl-copy && notify-send -a OCR 'Text copied' "$t""#; }
+    Mod+Shift+X hotkey-overlay-title="Copy text from a region (OCR)" { spawn-sh r#"t=$(grim -g "$(slurp)" - | tesseract - - -l eng+rus 2>/dev/null) && [ -n "$t" ] && printf '%s' "$t" | wl-copy && notify-send -a OCR 'Text copied' "$t""#; }
     // Press again to stop. Records system audio; saved to ~/Videos.
     Mod+Shift+R hotkey-overlay-title="Record a region (again to stop)" { spawn-sh r#"
         pkill -INT -x wf-recorder && exit

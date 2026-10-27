@@ -16,3 +16,6 @@ spawn-at-startup "awww-daemon"
 // session, so they restart if they crash: `journalctl --user -u elephant -u walker`.
 spawn-at-startup "systemd-run" "--user" "--collect" "--unit=elephant" "--property=PartOf=graphical-session.target" "--property=Restart=on-failure" "elephant"
 spawn-at-startup "systemd-run" "--user" "--collect" "--unit=walker" "--property=PartOf=graphical-session.target" "--property=Restart=on-failure" "walker" "--gapplication-service"
+
+spawn-sh-at-startup "systemctl --user import-environment XDG_MENU_PREFIX && kbuildsycoca6"
+spawn-sh-at-startup "command -v niri-focused-booster >/dev/null && [ -r /sys/fs/cgroup/dmem.capacity ] && exec niri-focused-booster"
